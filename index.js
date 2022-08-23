@@ -21,8 +21,8 @@ mongoose
 
 
 app.get('/', (req, res) => { // 루트 디렉토리에 라우트 시
-    res.send('Hello World!') // 웹사이트에 출력
-})
+    res.send('Hello World!'); // 웹사이트에 출력
+});
 
 // 라우터
 app.use("/api/users", require("./routes/users"));
@@ -30,6 +30,15 @@ app.use("/api/class", require("./routes/class"));
 app.use("/api/favorite", require("./routes/favorite"));
 app.use("/api/memo", require("./routes/memo"));
 
+// cors header
+app.all("/*", function (req, res, next) {
+  //res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Origin", "https://be-a-book.herokuapp.com");
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+});
 
 app.listen(port, () => { // 포트(5000)에서 실행(listen)
     console.log(`Example app listening on port ${port}`) // 서버 구동 시 터미널 콘솔에 출력
