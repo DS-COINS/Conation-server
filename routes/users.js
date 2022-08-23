@@ -3,7 +3,17 @@ const router = express.Router();
 const { User } = require("../models/User");
 
 const { auth } = require("../middleware/auth");
-  
+
+
+router.post("/getUserInfo", (req, res) => {
+    User.findOne({_id: req.body._id})
+    .exec((err, user) => {
+      if (err) return res.json({ success: false, err });
+      return res.status(200).send({
+        success: true, user
+      });
+    });
+});
 
 
 /* 아래는 auth 관련 라우트 */
