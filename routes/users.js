@@ -5,26 +5,36 @@ const { Enroll } = require("../models/Enroll");
 const { Class } = require("../models/Class");
 
 const { auth } = require("../middleware/auth");
+const { Favorite } = require("../models/Favorite");
 
 
 router.post("/getUserInfo", async (req, res, next) => {
   try{
     
+    const userId = req.body._id;
+
     // 유저 정보 찾기
-    const user = await User.findOne({_id: req.body._id});
+    const user = await User.findOne({_id: userId});
     
     // 개설한 클래스 찾기
-    const writer = await Class.find({writer: req.body._id })
+    const writer = await Class.find({writer: userId})
 
     // 신청한 클래스 찾기
-    const applicant = await Enroll.find({applicant: req.body._id})
+    const applicant = await Enroll.find({applicant: userId})
     .populate("class");
+
+    // 찜 목록 찾기
+    const favorites = await Favorite.find({userId: userId})
+    .populate("classId");
+
 
     return res.status(200).json({
       success: true,
       user,
       writer,
-      applicant
+      applicant,
+      favorites
+
     });
 
   } catch (err) {
@@ -33,6 +43,13 @@ router.post("/getUserInfo", async (req, res, next) => {
   }
 
 });
+
+
+
+
+
+
+
 
 
 /* 아래는 auth 관련 라우트 */

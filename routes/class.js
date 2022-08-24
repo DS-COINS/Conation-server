@@ -41,6 +41,9 @@ router.post("/registerClass", (req, res) => {
     })
   })
 
+  /* 신청 알림 생성 */
+  
+
 });
 
 
