@@ -3,6 +3,7 @@ const router = express.Router();
 const { Class } = require("../models/Class");
 const { Enroll } = require("../models/Enroll");
 const { User } = require("../models/User");
+const { Notification } = require("../models/Notification");
 
 router.post("/postClass", (req, res) => {
 
@@ -29,20 +30,25 @@ router.post("/postClass", (req, res) => {
 });
 
 
-router.post("/registerClass", (req, res) => {
+router.post("/registerClass", async (req, res, next) => {
+  try{
 
-  const enroll = new Enroll(req.body);
+    const enroll = new Enroll(req.body);
+    const notification = new Notification(req.body);
 
-  enroll.save()
-  .then((enroll) => {
-    res.status(200).json({
-      success: true,
-      enroll
+    await enroll.save()
+    await notification.save()
+
+    return res.status(200).json({
+      success: true
     })
-  })
 
-  /* 신청 알림 생성 */
-  
+} catch (err) {
+  res.json({ success: false, err });
+  next(err);
+}
+
+
 
 });
 

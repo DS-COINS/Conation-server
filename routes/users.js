@@ -3,6 +3,7 @@ const router = express.Router();
 const { User } = require("../models/User");
 const { Enroll } = require("../models/Enroll");
 const { Class } = require("../models/Class");
+const { Notification } = require("../models/Notification");
 
 const { auth } = require("../middleware/auth");
 const { Favorite } = require("../models/Favorite");
@@ -44,11 +45,16 @@ router.post("/getUserInfo", async (req, res, next) => {
 
 });
 
-
-
-
-
-
+// 개설한 클래스의 신청 알림 목록 가져오기
+router.post("/getNotifications", (req, res) => {
+  Notification.find({ writer: req.body._id })
+  .populate("class", "title")
+  .populate("applicant", "name")
+    .exec((err, result) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).json({ success: true, result });
+  });
+});
 
 
 

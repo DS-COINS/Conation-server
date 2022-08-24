@@ -31,6 +31,7 @@ app.use("/api/users", require("./routes/users"));
 app.use("/api/class", require("./routes/class"));
 app.use("/api/favorite", require("./routes/favorite"));
 app.use("/api/memo", require("./routes/memo"));
+app.use("/api/notification", require("./routes/notification"));
 
 // cors header
 app.all("/*", function (req, res, next) {
