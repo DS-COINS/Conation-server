@@ -22,8 +22,6 @@ router.post("/postMemo", (req, res) => {
 
 router.get("/getMemos", async (req, res, next) => {
   try {
-    const page = req.query.page || 1;
-    const perPage = 8;
 
     const memos = await Memo.find({})
     return res.status(200).json({
