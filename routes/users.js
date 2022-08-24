@@ -1,18 +1,37 @@
 const express = require("express");
 const router = express.Router();
 const { User } = require("../models/User");
+const { Enroll } = require("../models/Enroll");
+const { Class } = require("../models/Class");
 
 const { auth } = require("../middleware/auth");
 
 
-router.post("/getUserInfo", (req, res) => {
-    User.findOne({_id: req.body._id})
-    .exec((err, user) => {
-      if (err) return res.json({ success: false, err });
-      return res.status(200).send({
-        success: true, user
-      });
+router.post("/getUserInfo", async (req, res, next) => {
+  try{
+    
+    // 유저 정보 찾기
+    const user = await User.findOne({_id: req.body._id});
+    
+    // 개설한 클래스 찾기
+    const writer = await Class.find({writer: req.body._id })
+
+    // 신청한 클래스 찾기
+    const applicant = await Enroll.find({applicant: req.body._id})
+    .populate("class");
+
+    return res.status(200).json({
+      success: true,
+      user,
+      writer,
+      applicant
     });
+
+  } catch (err) {
+    res.json({ success: false, err });
+    next(err);
+  }
+
 });
 
 

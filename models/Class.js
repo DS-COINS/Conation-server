@@ -13,7 +13,7 @@ const classSchema = mongoose.Schema({
         type: String,
         trim: true
     },
-    contents: {
+    content: {
         type: String
     },
     image: String,
