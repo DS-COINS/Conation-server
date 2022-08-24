@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Class } = require("../models/Class");
 const { Enroll } = require("../models/Enroll");
-
+const { User } = require("../models/User");
 
 router.post("/postClass", (req, res) => {
 
@@ -64,7 +64,6 @@ router.get("/getClassList", async (req, res, next) => {
 });
 
 
-
 router.get("/search", (req, res) => {
   let keyword = req.query.keyword;
   Class.find( {$or:[{ title: {$regex : keyword} }, 
@@ -77,5 +76,13 @@ router.get("/search", (req, res) => {
     });
 });
 
+router.post("/getClassDetail", (req, res) => {
+  Class.findOne({ _id: req.body._id })
+    .populate("writer")
+    .exec((err, result) => {
+      if (err) return res.status(400).send(err);
+      return res.status(200).json({ success: true, result });
+  });
+});
 
 module.exports = router;

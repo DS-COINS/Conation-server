@@ -26,15 +26,8 @@ router.get("/getMemos", async (req, res, next) => {
     const perPage = 8;
 
     const memos = await Memo.find({})
-      .limit(perPage * 1)
-      .skip((page - 1) * perPage);
-
-    const total = await Memo.countDocuments({});
     return res.status(200).json({
-      success: true,
       memos,
-      totalPages: Math.ceil(total / perPage),
-      currentPage: page,
     });
   } catch (err) {
     res.json({ success: false, err });
