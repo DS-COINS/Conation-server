@@ -44,4 +44,38 @@ router.post("/registerClass", (req, res) => {
 });
 
 
+router.get("/getClassList", async (req, res, next) => {
+  try {
+  
+    let result;
+    if (req.query.category) {
+      result = await Class.find({ category: req.query.category })
+    } else {
+      result = await Class.find()
+    }
+
+    return res.status(200).json({ success: true, result });
+      
+  } catch (err) {
+    res.json({ success: false, err });
+    next(err);
+  }
+
+});
+
+
+
+router.get("/search", (req, res) => {
+  let keyword = req.query.keyword;
+  Class.find( {$or:[{ title: {$regex : keyword} }, 
+                        { content: {$regex : keyword} },
+                        { category: {$regex : keyword}}
+                        ]})
+    .exec((err, result) => {
+      if (err) return res.status(400).send(err);
+            return res.status(200).json({ success: true, result });
+    });
+});
+
+
 module.exports = router;
