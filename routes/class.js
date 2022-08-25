@@ -90,13 +90,26 @@ router.post("/getClassDetail", async (req, res, next) => {
     const result = await Class.findOne({ _id: req.body._id })
       .populate("writer")
 
+    const applicantTemp = await Enroll.find({ writer: result.writer._id})
+      .populate("applicant", "name")
+    const applicant = [];
+    for(var i=0; i<applicantTemp.length; i++) {
+      const id = applicantTemp[i].applicant._id
+      const name = applicantTemp[i].applicant.name
+      applicant.push({_id: id, name: name});
+   }
+    
     // 추천 클래스 배열 (추후 인공지능 서버와 연결)
     const recommend = await Class.find({category: result.category})
-    
     // 추천 클래스 4개만 전송
     const recommend4 = recommend.slice(0,4) 
     
-    return res.status(200).json({ success: true, result, recommend: recommend4 });
+    return res.status(200).json({
+      success: true,
+      result,
+      applicant,
+      recommend: recommend4
+    });
   } catch (err) {
     res.json({ success: false, err });
     next(err);
