@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const reviewSchema = mongoose.Schema({
-    userId: {  // 후기 작성한 사용자
+    user: {  // 후기 작성한 사용자
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    classId: {  // 클래스
+    class: {  // 클래스
         type: Schema.Types.ObjectId,
         ref: 'Class'
     },

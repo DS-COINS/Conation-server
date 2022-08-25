@@ -29,6 +29,9 @@ try {
     // 전체 리뷰 리턴
     if (userId==null) {
         const review = await Review.find({})
+        .populate("user", "name")
+        .populate("class", "title");  
+
         return res.status(200).json({
             review,
         });
@@ -36,8 +39,12 @@ try {
 
     // 로그인한 사용자
     // 자신의 리뷰를 상단에 리턴
-    const myReview = await Review.find({userId: userId})
-    const othersReview = await Review.find({userId: {$ne: userId}})
+    const myReview = await Review.find({user: userId})
+    .populate("user", "name")
+    .populate("class", "title");  
+    const othersReview = await Review.find({user: {$ne: userId}})
+    .populate("user", "name")
+    .populate("class", "title"); 
     const review = myReview.concat(othersReview);
     return res.status(200).json({
         review,
