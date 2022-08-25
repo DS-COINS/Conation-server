@@ -21,13 +21,20 @@ router.post("/getUserInfo", async (req, res, next) => {
     const writer = await Class.find({writer: userId})
 
     // 신청한 클래스 찾기
-    const applicant = await Enroll.find({applicant: userId})
+    const applicantTemp = await Enroll.find({applicant: userId}, {class:1})
     .populate("class");
-
+    let applicant = [];
+    for(var i=0; i<applicantTemp.length; i++) {
+       applicant.push(applicantTemp[i].class);
+    }
+    
     // 찜 목록 찾기
-    const favorites = await Favorite.find({userId: userId})
+    const favoritesTemp = await Favorite.find({userId: userId})
     .populate("classId");
-
+    let favorites = [];
+    for(var i=0; i<favoritesTemp.length; i++) {
+      favorites.push(favoritesTemp[i].classId);
+    }
 
     return res.status(200).json({
       success: true,
@@ -35,7 +42,6 @@ router.post("/getUserInfo", async (req, res, next) => {
       writer,
       applicant,
       favorites
-
     });
 
   } catch (err) {
