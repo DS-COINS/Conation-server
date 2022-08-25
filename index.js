@@ -44,6 +44,8 @@ app.all("/*", function (req, res, next) {
   next();
 });
 
+/* 이미지 저장 정적 파일 경로 */
+app.use("/public", express.static("public"));
 
 app.listen(port, () => { // 포트(5000)에서 실행(listen)
     console.log(`Example app listening on port ${port}`) // 서버 구동 시 터미널 콘솔에 출력

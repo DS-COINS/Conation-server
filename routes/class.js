@@ -1,32 +1,119 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+const mongoose = require("mongoose");
 const { Class } = require("../models/Class");
 const { Enroll } = require("../models/Enroll");
 const { User } = require("../models/User");
 const { Notification } = require("../models/Notification");
 
-router.post("/post", (req, res) => {
+/* 이미지를 포함한 후기 업로드 */
 
-  // 이미지 없이
-  const newclass = new Class({
-    title: req.body.title,
-    writer: req.body.writer,
-    placetype: req.body.placetype,
-    category: req.body.category,
-    content: req.body.content
-  });
+const DIR = "./public/class/";
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, DIR);
+  }, //file 을 받아와서 DIR 경로에 저장한다.
+  filename: (req, file, cb) => {
+    // 저장할 파일의 이름을 설정한다.
+    //const fileName = file.originalname.toLowerCase().split(' ').join('-');
+    //cb(null, uuidv4() + '-' + fileName)
+    // (uuidv4 O) 7c7c98c7-1d46-4305-ba3c-f2dc305e16b0-통지서
+    // (uuidv4 X) 통지서
 
-  newclass
-    .save()
-    .then((result) => {
-      res.status(200).json({
-        success: true,
-        result: result,
-      });
-    })
-    .catch((err) => {
-      res.json({ success: false, err });
+    let extension = path.extname(file.originalname);
+    let basename = path.basename(file.originalname, extension);  // 원본파일이름 사용하지 않음
+    cb(null, Date.now() + extension);
+  },
+});
+
+var upload = multer({
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    // 파일 확장자 필터
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb(new Error("Only .png .jpg and .jpeg format allowed!"));
+    }
+  },
+});
+
+const nullImage = "http://localhost:5001/public/class/nullImage.png"  // 빈 이미지 경로
+
+router.post("/post",  upload.single("image"), (req, res, next) => {
+
+  if (req.file == null) {
+    /* 이미지가 없는 경우 */
+    const newclass = new Class({
+      _id: new mongoose.Types.ObjectId(),
+      title: req.body.title,
+      writer: req.body.writer,
+      placetype: req.body.placetype,
+      category: req.body.category,
+      content: req.body.content,
+      contact: req.body.contact,
+      image: nullImage,
     });
+
+    newclass
+      .save()
+      .then((result) => {
+        res.status(200).json({
+          success: true,
+          result: result,
+        });
+      })
+      .catch((err) => {
+        res.json({ success: false, err });
+      });
+    
+  } else {
+
+    /* 이미지가 있는 경우 */
+
+    // upload.single('image') 에서 image 는 formData 의 key 를 말한다.
+    // 따라서 "image" key 의 value 값을 서버의 지정된 폴더에 저장한다.
+    const url = req.protocol + "://" + req.get("host");
+    // req.protocol => http or https
+    // req.get('host') => (현재) localhost:5001
+    const newclass = new Class({
+      _id: new mongoose.Types.ObjectId(),
+      title: req.body.title,
+      writer: req.body.writer,
+      placetype: req.body.placetype,
+      category: req.body.category,
+      content: req.body.content,
+      contact: req.body.contact,
+      image: url + "/public/class/" + req.file.filename,
+    });
+
+    newclass
+      .save()
+      .then((result) => {
+        res.status(201).json({
+          success: true,
+          uploaded: {
+            _id: result._id,
+            image: result.image,
+          },
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json({
+          error: err,
+        });
+      });
+
+    
+  }
 });
 
 
@@ -47,7 +134,6 @@ router.post("/register", async (req, res, next) => {
   res.json({ success: false, err });
   next(err);
 }
-
 
 
 });

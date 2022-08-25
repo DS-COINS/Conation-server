@@ -21,7 +21,10 @@ const classSchema = mongoose.Schema({
     favorites: [{
         type: Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
+    contact: {
+        type: String
+    }
 })
 
 
