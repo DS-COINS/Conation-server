@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 5000;  // 백 서버 포트 설정
+const port = process.env.PORT || 5001;  // 백 서버 포트 설정
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser"); // 로그인 토큰을 쿠키에 저장하기
 require("dotenv").config();  // .env 파일에서 읽어오기

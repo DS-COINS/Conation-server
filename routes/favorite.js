@@ -25,7 +25,8 @@ router.post("/postFavorite", async (req, res, next) => {
             {$pull: {favorites: userId}})
 
         return res.status(200).json({
-            success: true
+            success: true,
+            heart: false
         });
     }
 
@@ -45,7 +46,8 @@ router.post("/postFavorite", async (req, res, next) => {
         {$addToSet: {favorites: userId}})
     
     return res.status(200).json({
-      success: true
+      success: true,
+      heart: true
     });
   } catch (err) {
     res.json({ success: false, err });

@@ -5,7 +5,7 @@ const { Enroll } = require("../models/Enroll");
 const { User } = require("../models/User");
 const { Notification } = require("../models/Notification");
 
-router.post("/postClass", (req, res) => {
+router.post("/post", (req, res) => {
 
   // 이미지 없이
   const newclass = new Class({
@@ -30,7 +30,7 @@ router.post("/postClass", (req, res) => {
 });
 
 
-router.post("/registerClass", async (req, res, next) => {
+router.post("/register", async (req, res, next) => {
   try{
 
     const enroll = new Enroll(req.body);
@@ -85,13 +85,22 @@ router.get("/search", (req, res) => {
     });
 });
 
-router.post("/getClassDetail", (req, res) => {
-  Class.findOne({ _id: req.body._id })
-    .populate("writer")
-    .exec((err, result) => {
-      if (err) return res.status(400).send(err);
-      return res.status(200).json({ success: true, result });
-  });
+router.post("/getClassDetail", async (req, res, next) => {
+  try {
+    const result = await Class.findOne({ _id: req.body._id })
+      .populate("writer")
+
+    // 추천 클래스 배열 (추후 인공지능 서버와 연결)
+    const recommend = await Class.find({category: result.category})
+    
+    // 추천 클래스 4개만 전송
+    const recommend4 = recommend.slice(0,4) 
+    
+    return res.status(200).json({ success: true, result, recommend: recommend4 });
+  } catch (err) {
+    res.json({ success: false, err });
+    next(err);
+  }
 });
 
 module.exports = router;
