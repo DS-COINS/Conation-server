@@ -176,6 +176,7 @@ router.post("/getClassDetail", async (req, res, next) => {
     const result = await Class.findOne({ _id: req.body._id })
       .populate("writer")
 
+    // 클래스 신청자 배열
     const applicantTemp = await Enroll.find({ writer: result.writer._id})
       .populate("applicant", "name")
     const applicant = [];
@@ -183,10 +184,38 @@ router.post("/getClassDetail", async (req, res, next) => {
       const id = applicantTemp[i].applicant._id
       const name = applicantTemp[i].applicant.name
       applicant.push({_id: id, name: name});
-   }
+    }
     
+
     // 추천 클래스 배열 (추후 인공지능 서버와 연결)
-    const recommend = await Class.find({category: result.category})
+    //const recommend = await Class.find({category: result.category})
+    
+    const title = result.title
+    const category = result.category
+
+    try {
+        
+        await axios
+          .post(`http://localhost:5000/exactRecommend`, {
+            title, category
+          })
+          .then((response) => {
+            recommend = response.data.result;
+            console.log(response.data);
+          });
+        await axios
+          .post(`http://localhost:5000/similarRecommend`, {
+            title, category
+          })
+          .then((response) => {
+            recommend = response.data.result;
+            console.log(response.data);
+          });
+      } catch (e) {
+        return res.status(200).json({ success: false, err: e });
+      }
+    
+
     // 추천 클래스 4개만 전송
     const recommend4 = recommend.slice(0,4) 
     
